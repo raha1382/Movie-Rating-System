@@ -4,10 +4,13 @@ from alembic import context
 import os
 from dotenv import load_dotenv
 
-# Import Base and DATABASE_URL
-from app.models.base import Base
+# Load .env
+load_dotenv()
+
+# Import Base and DATABASE_URL from your project
+from app.db.base import Base
 from app.db.session import DATABASE_URL
-import app.models 
+import app.models  # Import all models so Alembic can detect tables
 
 # Alembic Config object
 config = context.config
@@ -16,14 +19,15 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# target_metadata for autogenerate
+# Set target_metadata for autogenerate
 target_metadata = Base.metadata
 
-# set sqlalchemy url from .env
+# Override sqlalchemy.url from .env
 config.set_main_option("sqlalchemy.url", DATABASE_URL)
 
 
 def run_migrations_offline() -> None:
+    """Run migrations in 'offline' mode."""
     url = config.get_main_option("sqlalchemy.url")
     context.configure(
         url=url,
@@ -37,6 +41,7 @@ def run_migrations_offline() -> None:
 
 
 def run_migrations_online() -> None:
+    """Run migrations in 'online' mode."""
     connectable = engine_from_config(
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
