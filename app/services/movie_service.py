@@ -2,7 +2,8 @@ from sqlalchemy.orm import Session
 from app.models.movie import Movie
 from app.repositories.movie_repository import MovieRepository
 from app.repositories.director_repository import DirectorRepository
-from app.models import Rating
+from app.models.rating import Rating
+from sqlalchemy import func
 from app.exceptions.movie_exceptions import (
     MovieNotFoundError,
     InvalidTitleError,
@@ -141,10 +142,9 @@ class MovieService:
 
         self.movie_repo.delete(db, movie)
 
-    @staticmethod
-    def get_movies(db: Session, page: int = 1, page_size: int = 10):
+    def get_movies(self, db: Session, page: int = 1, page_size: int = 10):
         skip = (page - 1) * page_size
-        raw_movies = MovieRepository.fetch_movies_with_aggregation(db, skip=skip, limit=page_size)
+        raw_movies = self.movie_repo.fetch_movies_with_aggregation(db, skip=skip, limit=page_size)
 
         result = []
         for movie, director_name, avg_rating, ratings_count in raw_movies:
@@ -166,9 +166,8 @@ class MovieService:
             "data": result
         }
 
-    @staticmethod
-    def get_movie_detail(db: Session, movie_id: int):
-        movie = MovieRepository.fetch_movie_by_id(db, movie_id)
+    def get_movie_detail(self, db: Session, movie_id: int):
+        movie = self.movie_repo.fetch_movie_by_id(db, movie_id)
         if not movie:
             return None
 
@@ -190,8 +189,7 @@ class MovieService:
             "ratings_count": ratings_count
         }
 
-    @staticmethod
-    def add_rating(db: Session, movie_id: int, score: int):
+    def add_rating(self, db: Session, movie_id: int, score: int):
         if not 1 <= score <= 10:
             raise ValueError("The score must be an integer between 1 and 10.")
 
