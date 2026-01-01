@@ -12,6 +12,8 @@ from app.exceptions.movie_exceptions import (
     InvalidGenreError
 )
 
+
+
 class MovieService:
 
     def __init__(self):
@@ -166,30 +168,8 @@ class MovieService:
             "data": result
         }
 
-    def get_movie_detail(self, db: Session, movie_id: int):
-        movie = self.movie_repo.fetch_movie_by_id(db, movie_id)
-        if not movie:
-            return None
-
-        avg_rating = db.query(func.coalesce(func.avg(Rating.score), 0))\
-                       .filter(Rating.movie_id == movie.id).scalar()
-        ratings_count = db.query(func.count(Rating.id))\
-                          .filter(Rating.movie_id == movie.id).scalar()
-
-        genres = [g.name for g in movie.genres]
-
-        return {
-            "id": movie.id,
-            "title": movie.title,
-            "release_year": movie.release_year,
-            "cast": movie.cast,
-            "director": movie.director.name if movie.director else None,
-            "genres": genres,
-            "average_rating": float(avg_rating),
-            "ratings_count": ratings_count
-        }
-
     def add_rating(self, db: Session, movie_id: int, score: int):
+
         if not 1 <= score <= 10:
             raise ValueError("The score must be an integer between 1 and 10.")
 
@@ -198,3 +178,23 @@ class MovieService:
         db.commit()
         db.refresh(rating)
         return rating
+
+    def get_movie_detail(self, db: Session, movie_id: int):
+        row = self.movie_repo.fetch_movie_with_aggregation(db, movie_id)
+        if not row:
+            return None
+
+        movie, director_name, avg_rating, ratings_count = row
+        genres = [g.name for g in movie.genres]
+
+        return {
+            "id": movie.id,
+            "title": movie.title,
+            "release_year": movie.release_year,
+            "cast": movie.cast,
+            "director": director_name,
+            "genres": genres,
+            "average_rating": float(avg_rating),
+            "ratings_count": ratings_count
+            }
+  
