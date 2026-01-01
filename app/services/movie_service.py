@@ -103,7 +103,7 @@ class MovieService:
 
         return self.movie_repo.save(db, movie)
     
-    def list_movies(
+    def select_movies(
         self,
         db: Session,
         title: str | None = None,
@@ -146,6 +146,7 @@ class MovieService:
             raise MovieNotFoundError(movie_id)
 
         self.movie_repo.delete(db, movie)
+
 
     # Aggregation / Ratings Methods
 
@@ -203,3 +204,4 @@ class MovieService:
             "ratings_count": ratings_count
             }
   
+

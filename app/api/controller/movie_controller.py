@@ -1,21 +1,86 @@
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 
+from datetime import datetime
 from app.db.session import get_db
 from app.services.movie_service import MovieService
-from app.schemas.movie import (
+from app.api.schemas.movie import (
     MovieCreate,
     MovieUpdate,
 )
-from app.schemas.rating import RatingCreate
+from app.api.schemas.rating import RatingCreate
+
 from app.exceptions.movie_exceptions import MovieNotFoundError
 
 router = APIRouter(prefix="/api/v1/movies", tags=["Movies"])
 movie_service = MovieService()
 
-# ----------------------------
-# List movies (aggregation)
-# ----------------------------
+
+@router.post("/", response_model=MovieCreate, status_code=status.HTTP_201_CREATED)
+def create_movie(
+    payload: MovieCreate,
+    db: Session = Depends(get_db)
+):
+    movie = movie_service.create_movie(
+        db=db,
+        title=payload.title,
+        release_year=payload.release_year,
+        director_id=payload.director_id,
+        genre_ids=payload.genres,
+        cast=payload.cast
+    )
+
+    return {
+        "status": "success",
+        "data": {
+            "id": movie.id,
+            "title": movie.title,
+            "release_year": movie.release_year,
+            "director": {
+                "id": movie.director.id,
+                "name": movie.director.name
+            },
+            "genres": [genre.name for genre in movie.genres],
+            "cast": movie.cast,
+            "average_rating": None,
+            "ratings_count": 0
+        }
+    }
+
+@router.put("/{movie_id}", status_code=status.HTTP_200_OK)
+def update_movie(
+    movie_id: int,
+    payload: MovieUpdate,
+    db: Session = Depends(get_db)
+):
+    movie = movie_service.update_movie(
+        db=db,
+        movie_id=movie_id,
+        title=payload.title,
+        release_year=payload.release_year,
+        director_id=payload.director_id,
+        cast=payload.cast,
+        genre_ids=payload.genres
+    )
+    movie_result = movie_service.get_movie_detail(db=db,movie_id=movie.id)
+
+    if not movie_result:
+        raise ModuleNotFoundError(movie_id)
+
+    return {
+        "status": "success",
+        "data": movie_result,
+        "updated_at" : datetime.utcnow().isoformat() + "Z"
+    }
+
+@router.delete("/{movie_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_movie(
+    movie_id: int,
+    db: Session = Depends(get_db)
+):
+    movie_service.delete_movie(db, movie_id)
+    return None
+
 @router.get("/", status_code=status.HTTP_200_OK)
 def list_movies(
     page: int = Query(1, ge=1),
@@ -28,9 +93,6 @@ def list_movies(
         "data": data
     }
 
-# ----------------------------
-# Movie detail
-# ----------------------------
 @router.get("/{movie_id}", status_code=status.HTTP_200_OK)
 def get_movie_detail(
     movie_id: int,
@@ -45,9 +107,6 @@ def get_movie_detail(
         "data": movie
     }
        
-# ----------------------------
-# Add rating
-# ----------------------------
 @router.post("/{movie_id}/ratings", status_code=status.HTTP_201_CREATED)
 def add_rating(
     movie_id: int,
@@ -68,3 +127,4 @@ def add_rating(
             "score": rating.score
         }
     }
+
