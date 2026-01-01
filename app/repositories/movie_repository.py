@@ -37,6 +37,7 @@ class MovieRepository:
     # Aggregation / Ratings Methods
 
     def fetch_movies_with_aggregation(self, db: Session, skip: int = 0, limit: int = 10):
+
         query = (
             db.query(
                 Movie,
@@ -48,7 +49,9 @@ class MovieRepository:
             .outerjoin(Movie.ratings)
             .group_by(Movie.id, Director.name)
             .order_by(Movie.id)
+
             .offset(skip) 
+
             .limit(limit)
         )
         return query.all()

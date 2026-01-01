@@ -2,8 +2,6 @@ from sqlalchemy.orm import Session
 from app.models.movie import Movie
 from app.repositories.movie_repository import MovieRepository
 from app.repositories.director_repository import DirectorRepository
-from app.models.rating import Rating
-from sqlalchemy import func
 from app.exceptions.movie_exceptions import (
     MovieNotFoundError,
     InvalidTitleError,
@@ -146,60 +144,3 @@ class MovieService:
             raise MovieNotFoundError(movie_id)
 
         self.movie_repo.delete(db, movie)
-
-    # Aggregation / Ratings Methods
-
-    def get_movies(self, db: Session, page: int = 1, page_size: int = 10):
-        skip = (page - 1) * page_size
-        raw_movies = self.movie_repo.fetch_movies_with_aggregation(db, skip=skip, limit=page_size)
-
-        result = []
-        for movie, director_name, avg_rating, ratings_count in raw_movies:
-            genres = [g.name for g in movie.genres]
-            result.append({
-                "id": movie.id,
-                "title": movie.title,
-                "release_year": movie.release_year,
-                "cast": movie.cast,
-                "director": director_name,
-                "genres": genres,
-                "average_rating": float(avg_rating),
-                "ratings_count": ratings_count
-            })
-
-        return {
-            "page": page,
-            "page_size": page_size,
-            "data": result
-        }
-
-    def add_rating(self, db: Session, movie_id: int, score: int):
-
-        if not 1 <= score <= 10:
-            raise InvalidRatingError(score)
-
-        rating = Rating(movie_id=movie_id, score=score)
-        db.add(rating)
-        db.commit()
-        db.refresh(rating)
-        return rating
-
-    def get_movie_detail(self, db: Session, movie_id: int):
-        row = self.movie_repo.fetch_movie_with_aggregation(db, movie_id)
-        if not row:
-            return None
-
-        movie, director_name, avg_rating, ratings_count = row
-        genres = [g.name for g in movie.genres]
-
-        return {
-            "id": movie.id,
-            "title": movie.title,
-            "release_year": movie.release_year,
-            "cast": movie.cast,
-            "director": director_name,
-            "genres": genres,
-            "average_rating": float(avg_rating),
-            "ratings_count": ratings_count
-            }
-  
