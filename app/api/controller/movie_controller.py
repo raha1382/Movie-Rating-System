@@ -7,7 +7,10 @@ from app.services.movie_service import MovieService
 from app.api.schemas.movie import (
     MovieCreate,
     MovieUpdate,
+    MovieListItem,
+    MovieDetail
 )
+from app.api.schemas.rating import RatingCreate
 from app.api.schemas.rating import RatingCreate
 
 from app.exceptions.movie_exceptions import MovieNotFoundError
@@ -47,7 +50,7 @@ def create_movie(
         }
     }
 
-@router.put("/{movie_id}", status_code=status.HTTP_200_OK)
+@router.put("/{movie_id}", response_model=MovieUpdate, status_code=status.HTTP_200_OK)
 def update_movie(
     movie_id: int,
     payload: MovieUpdate,
@@ -81,7 +84,7 @@ def delete_movie(
     movie_service.delete_movie(db, movie_id)
     return None
 
-@router.get("/", status_code=status.HTTP_200_OK)
+@router.get("/", response_model=MovieListItem, status_code=status.HTTP_200_OK)
 def list_movies(
     page: int = Query(1, ge=1),
     page_size: int = Query(10, ge=1, le=100),
@@ -93,7 +96,7 @@ def list_movies(
         "data": data
     }
 
-@router.get("/{movie_id}", status_code=status.HTTP_200_OK)
+@router.get("/{movie_id}", response_model=MovieDetail, status_code=status.HTTP_200_OK)
 def get_movie_detail(
     movie_id: int,
     db: Session = Depends(get_db)
@@ -107,7 +110,7 @@ def get_movie_detail(
         "data": movie
     }
        
-@router.post("/{movie_id}/ratings", status_code=status.HTTP_201_CREATED)
+@router.post("/{movie_id}/ratings", response_model=RatingCreate, status_code=status.HTTP_201_CREATED)
 def add_rating(
     movie_id: int,
     payload: RatingCreate,
