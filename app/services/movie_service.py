@@ -18,6 +18,8 @@ class MovieService:
         self.movie_repo = MovieRepository()
         self.director_repo = DirectorRepository()
 
+    # CRUD Methods
+
     def create_movie(
         self,
         db: Session,
@@ -141,6 +143,8 @@ class MovieService:
             raise MovieNotFoundError(movie_id)
 
         self.movie_repo.delete(db, movie)
+
+    # Aggregation / Ratings Methods
 
     def get_movies(self, db: Session, page: int = 1, page_size: int = 10):
         skip = (page - 1) * page_size
