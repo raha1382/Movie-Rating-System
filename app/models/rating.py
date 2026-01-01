@@ -6,6 +6,7 @@ class Rating(Base):
     __tablename__ = "movie_ratings"
     id = Column(Integer, primary_key=True, index=True)
     movie_id = Column(Integer, ForeignKey("movies.id", ondelete="CASCADE"))
-    score = Column(Integer, nullable=False) 
+    score = Column(Integer, nullable=False, default=0)
+
     
     movie = relationship("Movie", back_populates="ratings")
