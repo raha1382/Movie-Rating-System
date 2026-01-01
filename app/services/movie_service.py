@@ -9,8 +9,11 @@ from app.exceptions.movie_exceptions import (
     InvalidTitleError,
     InvalidReleaseYearError,
     DirectorNotFoundError,
-    InvalidGenreError
+    InvalidGenreError,
+    InvalidRatingError
 )
+
+
 
 class MovieService:
 
@@ -170,16 +173,23 @@ class MovieService:
             "data": result
         }
 
+    def add_rating(self, db: Session, movie_id: int, score: int):
+
+        if not 1 <= score <= 10:
+            raise InvalidRatingError(score)
+
+        rating = Rating(movie_id=movie_id, score=score)
+        db.add(rating)
+        db.commit()
+        db.refresh(rating)
+        return rating
+
     def get_movie_detail(self, db: Session, movie_id: int):
-        movie = self.movie_repo.fetch_movie_by_id(db, movie_id)
-        if not movie:
+        row = self.movie_repo.fetch_movie_with_aggregation(db, movie_id)
+        if not row:
             return None
 
-        avg_rating = db.query(func.coalesce(func.avg(Rating.score), 0))\
-                       .filter(Rating.movie_id == movie.id).scalar()
-        ratings_count = db.query(func.count(Rating.id))\
-                          .filter(Rating.movie_id == movie.id).scalar()
-
+        movie, director_name, avg_rating, ratings_count = row
         genres = [g.name for g in movie.genres]
 
         return {
@@ -187,18 +197,9 @@ class MovieService:
             "title": movie.title,
             "release_year": movie.release_year,
             "cast": movie.cast,
-            "director": movie.director.name if movie.director else None,
+            "director": director_name,
             "genres": genres,
             "average_rating": float(avg_rating),
             "ratings_count": ratings_count
-        }
-
-    def add_rating(self, db: Session, movie_id: int, score: int):
-        if not 1 <= score <= 10:
-            raise ValueError("The score must be an integer between 1 and 10.")
-
-        rating = Rating(movie_id=movie_id, score=score)
-        db.add(rating)
-        db.commit()
-        db.refresh(rating)
-        return rating
+            }
+  
