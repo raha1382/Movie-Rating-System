@@ -103,7 +103,7 @@ class MovieService:
 
         return self.movie_repo.save(db, movie)
     
-    def list_movies(
+    def select_movies(
         self,
         db: Session,
         title: str | None = None,
