@@ -1,8 +1,33 @@
 from sqlalchemy.orm import Session, joinedload
-from sqlalchemy import func
-from app.models import Movie, Rating, Director, Genre
+from app.models.movie import Movie
+from app.models.genre import Genre
 
 class MovieRepository:
+
+    def create(self, db: Session, movie: Movie) -> Movie:
+        db.add(movie)
+        db.commit()
+        db.refresh(movie)
+        return movie
+
+    def get_genres_by_ids(self, db: Session, genre_ids: list[int]) -> list[Genre]:
+        return db.query(Genre).filter(Genre.id.in_(genre_ids)).all()
+    
+    def get_by_id(self, db: Session, movie_id: int) -> Movie | None:
+        return db.query(Movie).filter(Movie.id == movie_id).first()
+    
+    def save(self, db: Session, movie: Movie) -> Movie:
+        db.add(movie)
+        db.commit()
+        db.refresh(movie)
+        return movie
+    
+    def list_all(self, db: Session) -> list[Movie]:
+        return db.query(Movie).all()
+    
+    def delete(self, db: Session, movie: Movie) -> None:
+        db.delete(movie)
+        db.commit()
 
     @staticmethod
     def fetch_movies_with_aggregation(db: Session, skip: int = 0, limit: int = 10):
@@ -29,3 +54,4 @@ class MovieRepository:
         movie = db.query(Movie).options(joinedload(Movie.genres), joinedload(Movie.director))\
                   .filter(Movie.id == movie_id).first()
         return movie
+
