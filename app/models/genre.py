@@ -7,5 +7,6 @@ class Genre(Base):
     __tablename__ = "genres"
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, unique=True, nullable=False)
+    description = Column(Text, nullable=True)
     
     movies = relationship("Movie", secondary=movie_genres, back_populates="genres")
