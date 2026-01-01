@@ -2,6 +2,8 @@ from sqlalchemy.orm import Session
 from app.models import Rating
 from app.repositories.movie import MovieRepository
 
+
+
 class MovieService:
 
     @staticmethod
@@ -29,6 +31,7 @@ class MovieService:
             "data": result
         }
 
+<<<<<<< Updated upstream
     @staticmethod
     def get_movie_detail(db: Session, movie_id: int):
         movie = MovieRepository.fetch_movie_by_id(db, movie_id)
@@ -55,6 +58,9 @@ class MovieService:
 
     @staticmethod
     def add_rating(db: Session, movie_id: int, score: int):
+=======
+    def add_rating(self, db: Session, movie_id: int, score: int):
+>>>>>>> Stashed changes
         if not 1 <= score <= 10:
             raise ValueError("The score must be an integer between 1 and 10.")
 
@@ -63,3 +69,24 @@ class MovieService:
         db.commit()
         db.refresh(rating)
         return rating
+
+
+    def get_movie_detail(self, db: Session, movie_id: int):
+        row = self.movie_repo.fetch_movie_with_aggregation(db, movie_id)
+        if not row:
+            return None
+
+        movie, director_name, avg_rating, ratings_count = row
+        genres = [g.name for g in movie.genres]
+
+        return {
+            "id": movie.id,
+            "title": movie.title,
+            "release_year": movie.release_year,
+            "cast": movie.cast,
+            "director": director_name,
+            "genres": genres,
+            "average_rating": float(avg_rating),
+            "ratings_count": ratings_count
+            }
+  

@@ -18,7 +18,7 @@ class MovieRepository:
             .outerjoin(Movie.ratings)
             .group_by(Movie.id, Director.name)
             .order_by(Movie.id)
-            .offset(skip)
+            .offset(skip) 
             .limit(limit)
         )
         return query.all()
@@ -29,3 +29,18 @@ class MovieRepository:
         movie = db.query(Movie).options(joinedload(Movie.genres), joinedload(Movie.director))\
                   .filter(Movie.id == movie_id).first()
         return movie
+<<<<<<< Updated upstream
+=======
+
+    def fetch_movie_with_aggregation(self, db: Session, movie_id: int):
+        return db.query(
+            Movie,
+            Director.name.label("director_name"),
+            func.coalesce(func.avg(Rating.score), 0).label("average_rating"),
+            func.count(Rating.id).label("ratings_count")
+        ).join(Movie.director)\
+        .outerjoin(Movie.ratings)\
+        .filter(Movie.id == movie_id)\
+        .group_by(Movie.id, Director.name)\
+        .first()
+>>>>>>> Stashed changes
