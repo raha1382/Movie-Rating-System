@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, Table, Text
 from sqlalchemy.orm import relationship
 from app.db.base import Base
-from movie_genres import movie_genres
+from app.models.movie_genres import movie_genres
 
 class Genre(Base):
     __tablename__ = "genres"

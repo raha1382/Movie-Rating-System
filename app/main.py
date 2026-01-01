@@ -5,7 +5,7 @@ from app.api.controller import movie_controller
 from app.db.session import SessionLocal
 
 app = FastAPI(
-    title="ToDo List API - version",
+    title="Movie Rating System",
     description="Web API format",
     version="1.0.0",
     docs_url="/docs",
