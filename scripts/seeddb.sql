@@ -62,9 +62,9 @@ CREATE TABLE tmdb_credits_raw (
 
 ------------------------------- 4. Load raw data (psql-specific) -------------------------------
 -- Requires CSV files to be in the same directory as the script.
-\copy tmdb_movies_raw (budget,genres,homepage,id,keywords,original_language,original_title,overview,popularity,production_companies,production_countries,release_date,revenue,runtime,spoken_languages,status,tagline,title,vote_average,vote_count) FROM 'tmdb_5000_movies.csv' CSV HEADER;
+\copy tmdb_movies_raw (budget,genres,homepage,id,keywords,original_language,original_title,overview,popularity,production_companies,production_countries,release_date,revenue,runtime,spoken_languages,status,tagline,title,vote_average,vote_count) FROM '/scripts/tmdb_5000_movies.csv' CSV HEADER;
 
-\copy tmdb_credits_raw (movie_id,title,"cast",crew) FROM 'tmdb_5000_credits.csv' CSV HEADER;
+\copy tmdb_credits_raw (movie_id,title,"cast",crew) FROM '/scripts/tmdb_5000_credits.csv' CSV HEADER;
 
 ------------------------------- 5. Insert genres (Real data from TMDB) -----------------------------
 INSERT INTO genres(name, description)
