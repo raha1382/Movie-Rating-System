@@ -13,6 +13,7 @@ from app.api.schemas.movie import (
     DirectorOut,
     MovieOut
 )
+from app.api.schemas.rating import RatingOut
 from app.api.schemas.rating import RatingCreate
 from app.api.schemas.rating import RatingCreate
 
