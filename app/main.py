@@ -4,6 +4,9 @@ from app.exceptions.base import AppException
 from app.api.controller import movie_controller 
 from app.db.session import SessionLocal
 from fastapi.exceptions import RequestValidationError
+from app.logging_config import setup_logging
+
+logger = setup_logging()
 
 app = FastAPI(
     title="Movie Rating System",
@@ -20,6 +23,4 @@ app.add_exception_handler(RequestValidationError, validation_exception_handler)
 
 @app.on_event("startup")
 async def startup_event():
-    db = SessionLocal()
-    db.close()
-    print("Application startup complete")
+    logger.info("Application startup complete")

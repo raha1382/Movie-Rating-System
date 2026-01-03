@@ -2,6 +2,9 @@ from fastapi.exceptions import RequestValidationError
 from fastapi import Request
 from fastapi.responses import JSONResponse
 from app.exceptions.base import AppException
+from app.logging_config import setup_logging
+
+logger = setup_logging()
 
 
 # for pydantic errors
@@ -9,6 +12,8 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     first_error = exc.errors()[0]
     loc = first_error.get("loc", [])
     msg = first_error.get("msg", "Invalid input")
+
+    logger.warning(f"Validation error at {loc}: {msg}")
     
     return JSONResponse(
         status_code=422,
@@ -24,6 +29,8 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
 #for service errors
 async def app_exception_handler(request: Request, exc: AppException):
+    logger.error(f"Service error: {str(exc)}", exc_info=True)
+
     return JSONResponse(
         status_code=exc.status_code,
         content={

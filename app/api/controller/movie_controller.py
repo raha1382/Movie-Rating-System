@@ -16,9 +16,11 @@ from app.api.schemas.movie import (
 )
 from app.api.schemas.rating import RatingOut
 from app.api.schemas.rating import RatingCreate
-from app.api.schemas.rating import RatingCreate
 
 from app.exceptions.movie_exceptions import MovieNotFoundError
+
+from app.logging_config import setup_logging
+logger = setup_logging()
 
 router = APIRouter(prefix="/api/v1/movies", tags=["Movies"])
 movie_service = MovieService()
@@ -110,6 +112,10 @@ def list_movies(
     page_size: int = Query(10, ge=1, le=100),
     db: Session = Depends(get_db)
 ):
+    route = "/api/v1/movies"
+    logger.info(f"Listing movies: route={route}, title={title}, director={director}, genre={genre}, year={release_year}, page={page}, page_size={page_size}")
+
+
     result = movie_service.get_movies(
         db=db,
         title=title,
@@ -119,6 +125,9 @@ def list_movies(
         page=page,
         page_size=page_size
     )
+    
+    logger.info(f"Movies listed successfully (count={len(result['data'])})")
+
     result_items = [
         MovieDetail(
             id=m["id"],
@@ -172,11 +181,16 @@ def add_rating(
     payload: RatingCreate,
     db: Session = Depends(get_db)
 ):
+    route = f"/api/v1/movies/{movie_id}/ratings"
+    logger.info(f"Rating movie (movie_id={movie_id}, rating={payload.score}, route={route})")
+
     rating = movie_service.add_rating(
         db=db,
         movie_id=movie_id,
         score=payload.score
     )
+
+    logger.info(f"Rating saved successfully (movie_id={movie_id}, rating={payload.score})")
 
     return Response(
         status = "success",

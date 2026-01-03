@@ -160,6 +160,10 @@ class MovieService:
 
     def add_rating(self, db: Session, movie_id: int, score: int):
 
+        movie = self.movie_repo.get_by_id(db, movie_id)
+        if not movie:
+            raise MovieNotFoundError(movie_id)
+
         if not 1 <= score <= 10:
             raise InvalidRatingError(score)
 
