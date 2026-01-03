@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 from app.models.movie import Movie
+from app.models.director import Director
 from app.repositories.movie_repository import MovieRepository
 from app.repositories.director_repository import DirectorRepository
 from app.models.rating import Rating
@@ -34,18 +35,18 @@ class MovieService:
     ) -> Movie:
 
         if not title or not title.strip():
-            raise InvalidTitleError()
+            raise InvalidTitleError(title)
 
         if release_year and (release_year < 1888 or release_year > 2100):
-            raise InvalidReleaseYearError()
+            raise InvalidReleaseYearError(release_year)
 
         director = self.director_repo.get_by_id(db, director_id)
         if not director:
-            raise DirectorNotFoundError()
+            raise DirectorNotFoundError(director_id)
 
         genres = self.movie_repo.get_genres_by_ids(db, genre_ids)
         if len(genres) != len(genre_ids):
-            raise InvalidGenreError()
+            raise InvalidGenreError(genre_ids)
 
         movie = Movie(
             title=title,
@@ -73,7 +74,7 @@ class MovieService:
             raise MovieNotFoundError(movie_id)
 
         if title is not None and not title.strip():
-            raise InvalidTitleError()
+            raise InvalidTitleError(title)
 
         if release_year is not None and (release_year < 1888 or release_year > 2100):
             raise InvalidReleaseYearError(release_year)

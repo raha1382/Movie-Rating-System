@@ -5,10 +5,13 @@ from datetime import datetime
 from app.db.session import get_db
 from app.services.movie_service import MovieService
 from app.api.schemas.movie import (
-    MovieCreate,
-    MovieUpdate,
+    Moviein,
+    Movieupdate,
     MovieListItem,
-    MovieDetail
+    MovieDetail,
+    MovieCreateResponse,
+    DirectorOut,
+    MovieOut
 )
 from app.api.schemas.rating import RatingCreate
 from app.api.schemas.rating import RatingCreate
@@ -19,9 +22,9 @@ router = APIRouter(prefix="/api/v1/movies", tags=["Movies"])
 movie_service = MovieService()
 
 
-@router.post("/", response_model=MovieCreate, status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=MovieCreateResponse[MovieOut[DirectorOut]], status_code=status.HTTP_201_CREATED)
 def create_movie(
-    payload: MovieCreate,
+    payload: Moviein,
     db: Session = Depends(get_db)
 ):
     movie = movie_service.create_movie(
@@ -33,27 +36,28 @@ def create_movie(
         cast=payload.cast
     )
 
-    return {
-        "status": "success",
-        "data": {
-            "id": movie.id,
-            "title": movie.title,
-            "release_year": movie.release_year,
-            "director": {
-                "id": movie.director.id,
-                "name": movie.director.name
-            },
-            "genres": [genre.name for genre in movie.genres],
-            "cast": movie.cast,
-            "average_rating": None,
-            "ratings_count": 0
-        }
-    }
+    return MovieCreateResponse(
+        status = "success",
+        data = MovieOut(
+            id= movie.id,
+            title= movie.title,
+            release_year= movie.release_year,
+            director = DirectorOut(
+                id= movie.director.id,
+                name= movie.director.name
+            ),
+            genres= [genre.id for genre in movie.genres],
+            cast= movie.cast,
+            average_rating= None,
+            ratings_count= 0
+        ),
+        updated_at = None
+    )
 
-@router.put("/{movie_id}", response_model=MovieUpdate, status_code=status.HTTP_200_OK)
+@router.put("/{movie_id}", response_model=MovieCreateResponse[MovieOut[DirectorOut]], status_code=status.HTTP_200_OK)
 def update_movie(
     movie_id: int,
-    payload: MovieUpdate,
+    payload: Movieupdate,
     db: Session = Depends(get_db)
 ):
     movie = movie_service.update_movie(
@@ -66,15 +70,25 @@ def update_movie(
         genre_ids=payload.genres
     )
     movie_result = movie_service.get_movie_detail(db=db,movie_id=movie.id)
+    
+    return MovieCreateResponse(
+        status = "success",
+        data = MovieOut(
+            id= movie.id,
+            title= movie.title,
+            release_year= movie.release_year,
+            director = DirectorOut(
+                id= movie.director.id,
+                name= movie.director.name
+            ),
+            genres= [genre.id for genre in movie.genres],
+            cast= movie.cast,
+            average_rating= movie_result["average_rating"],
+            ratings_count= movie_result["ratings_count"]
+        ),
+        updated_at = datetime.utcnow().isoformat() + "Z"
+    )
 
-    if not movie_result:
-        raise ModuleNotFoundError(movie_id)
-
-    return {
-        "status": "success",
-        "data": movie_result,
-        "updated_at" : datetime.utcnow().isoformat() + "Z"
-    }
 
 @router.delete("/{movie_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_movie(

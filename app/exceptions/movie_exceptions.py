@@ -8,13 +8,15 @@ class MovieError(AppException):
 
 
 class InvalidTitleError(MovieError):
-    def __init__(self):
+    def __init__(self, title: str):
         super().__init__("title is required")
+        self.title = title
 
 
 class InvalidReleaseYearError(MovieError):
-    def __init__(self):
-        super().__init__("release_year is invalid")
+    def __init__(self, release_year: int):
+        super().__init__(f"release_year {release_year} is invalid")
+        self.release_year = release_year
 
 
 class DirectorNotFoundError(MovieError):
@@ -24,8 +26,9 @@ class DirectorNotFoundError(MovieError):
 
 
 class InvalidGenreError(MovieError):
-    def __init__(self):
-        super().__init__("one or more genre ids are invalid")
+    def __init__(self, genre_ids: list[int]):
+        super().__init__(f"one or more genre ids {genre_ids} are invalid")
+        self.genre_ids = genre_ids
 
 class MovieNotFoundError(MovieError):
     status_code = status.HTTP_404_NOT_FOUND
