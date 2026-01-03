@@ -14,6 +14,7 @@ services:
       - pgdata:/var/lib/postgresql/data
       - ./scripts:/scripts
 
+
   web:
     build: .
     container_name: movierating_web
@@ -26,6 +27,7 @@ services:
       - db
     environment:
       DATABASE_URL: postgresql://postgres:123456@db:5432/movie_db
+
 
 volumes:
   pgdata:
