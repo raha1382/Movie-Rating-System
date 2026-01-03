@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field
 from typing import List, Optional
 
 
+
 class MovieCreate(BaseModel):
     title: str = Field(..., min_length=1)
     release_year: int = Field(..., ge=1888, le=2026)
@@ -18,5 +19,29 @@ class MovieUpdate(BaseModel):
     cast: Optional[str] = None
 
 
+class DirectorOut(BaseModel):
+    id: int
+    name: str
 
+
+class MovieListItem(BaseModel):
+    id: int
+    title: str
+    release_year: Optional[int]
+    cast: Optional[str]
+    director: str
+    genres: List[str]
+    average_rating: float
+    ratings_count: int
+
+
+class MovieDetail(BaseModel):
+    id: int
+    title: str
+    release_year: Optional[int]
+    cast: Optional[str]
+    director: str
+    genres: List[str]
+    average_rating: float
+    ratings_count: int
 

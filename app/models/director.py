@@ -6,7 +6,7 @@ class Director(Base):
     __tablename__ = "directors"
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
-    birth_year = Column(Integer)
+    birth_year = Column(Integer, nullable=True)
     description = Column(Text, nullable=True)
     
     movies = relationship("Movie", back_populates="director")

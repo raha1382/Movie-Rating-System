@@ -1,3 +1,5 @@
+
+
 services:
   db:
     image: postgres:16
@@ -12,18 +14,20 @@ services:
       - pgdata:/var/lib/postgresql/data
       - ./scripts:/scripts
 
-  # web:
-  #   build: .
-  #   container_name: movierating_web
-  #   command: poetry run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
-  #   volumes:
-  #     - .:/app
-  #   ports:
-  #     - "8000:8000"
-  #   depends_on:
-  #     - db
-  #   environment:
-  #     DATABASE_URL: postgresql://postgres:123456@db:5432/movie_db
+
+  web:
+    build: .
+    container_name: movierating_web
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql://postgres:123456@db:5432/movie_db
+
 
 volumes:
   pgdata:

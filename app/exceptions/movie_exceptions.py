@@ -33,3 +33,12 @@ class MovieNotFoundError(MovieError):
 
     def __init__(self, movie_id: int):
         super().__init__(f"movie with id {movie_id} not found")
+        self.movie_id = movie_id
+
+
+class InvalidRatingError(ValueError):
+    def __init__(self, score):
+        super().__init__(f"The score must be an integer between 1 and 10. Got: {score}")
+        self.score = score
+
+
