@@ -1,0 +1,12 @@
+2026-01-03 21:46:29,197 - movie_rating - INFO - Application startup complete
+2026-01-03 21:52:38,144 - movie_rating - INFO - Application startup complete
+2026-01-04 01:24:37,851 - movie_rating - INFO - Application startup complete
+2026-01-04 01:25:54,337 - movie_rating - WARNING - Validation error at ('body', 'release_year'): Input should be greater than or equal to 1888
+2026-01-04 01:26:41,388 - movie_rating - INFO - Rating movie (movie_id=1006, rating=4, route=/api/v1/movies/1006/ratings)
+2026-01-04 01:27:10,234 - movie_rating - WARNING - Validation error at ('body', 'score'): Input should be greater than or equal to 1
+2026-01-04 01:27:48,023 - movie_rating - INFO - Rating movie (movie_id=1005, rating=3, route=/api/v1/movies/1005/ratings)
+2026-01-04 01:27:48,033 - movie_rating - INFO - Rating saved successfully (movie_id=1005, rating=3)
+2026-01-04 01:29:02,421 - movie_rating - INFO - Listing movies: route=/api/v1/movies, title=None, director=None, genre=None, year=None, page=1, page_size=10
+2026-01-04 01:29:02,518 - movie_rating - INFO - Movies listed successfully (count=10)
+2026-01-04 01:29:53,872 - movie_rating - INFO - Listing movies: route=/api/v1/movies, title=rrr, director=None, genre=None, year=None, page=1, page_size=10
+2026-01-04 01:29:53,886 - movie_rating - INFO - Movies listed successfully (count=0)
