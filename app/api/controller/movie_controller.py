@@ -36,7 +36,7 @@ def create_movie(
         cast=payload.cast
     )
 
-    return MovieCreateResponse(
+    return Response(
         status = "success",
         data = MovieOut(
             id= movie.id,
@@ -71,7 +71,7 @@ def update_movie(
     )
     movie_result = movie_service.get_movie_detail(db=db,movie_id=movie.id)
     
-    return MovieCreateResponse(
+    return Response(
         status = "success",
         data = MovieOut(
             id= movie.id,
@@ -124,7 +124,7 @@ def get_movie_detail(
         "data": movie
     }
        
-@router.post("/{movie_id}/ratings", response_model=RatingCreate, status_code=status.HTTP_201_CREATED)
+@router.post("/{movie_id}/ratings", response_model=Response[RatingOut], status_code=status.HTTP_201_CREATED)
 def add_rating(
     movie_id: int,
     payload: RatingCreate,
@@ -136,12 +136,12 @@ def add_rating(
         score=payload.score
     )
 
-    return {
-        "status": "success",
-        "data": {
-            "rating_id": rating.id,
-            "movie_id": rating.movie_id,
-            "score": rating.score
-        }
-    }
+    return Response(
+        status = "success",
+        data = RatingOut( 
+            rating_id = rating.id,
+            movie_id = rating.movie_id,
+            score = rating.score
+        )
 
+    )
