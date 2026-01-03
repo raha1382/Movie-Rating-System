@@ -8,8 +8,6 @@ data_type2 = TypeVar("data_type2")
 class Response(BaseModel,  Generic[data_type]):
     status: Literal['success', 'failure'] = 'success'
     data: data_type
-    updated_at: datetime | None = None
-
 
 class MovieOut(BaseModel, Generic[data_type2]):
     id: int
@@ -35,6 +33,7 @@ class Movieupdate(BaseModel):
     director_id: Optional[int] = None
     genres: Optional[List[int]] = None
     cast: Optional[str] = None
+    updated_at: datetime | None = None
 
 
 class DirectorOut(BaseModel):

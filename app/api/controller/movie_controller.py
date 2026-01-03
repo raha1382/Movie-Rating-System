@@ -51,8 +51,7 @@ def create_movie(
             cast= movie.cast,
             average_rating= None,
             ratings_count= 0
-        ),
-        updated_at = None
+        )
     )
 
 @router.put("/{movie_id}", response_model=Response[MovieOut[DirectorOut]], status_code=status.HTTP_200_OK)
@@ -85,9 +84,9 @@ def update_movie(
             genres= [genre.id for genre in movie.genres],
             cast= movie.cast,
             average_rating= movie_result["average_rating"],
-            ratings_count= movie_result["ratings_count"]
-        ),
-        updated_at = datetime.utcnow().isoformat() + "Z"
+            ratings_count= movie_result["ratings_count"],
+            updated_at = datetime.utcnow().isoformat() + "Z"
+        )
     )
 
 
