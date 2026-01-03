@@ -99,31 +99,49 @@ def delete_movie(
     movie_service.delete_movie(db, movie_id)
     return None
 
-@router.get("/", response_model=MovieListItem, status_code=status.HTTP_200_OK)
+@router.get("/", response_model=Response[MovieListItem], status_code=status.HTTP_200_OK)
 def list_movies(
     page: int = Query(1, ge=1),
     page_size: int = Query(10, ge=1, le=100),
     db: Session = Depends(get_db)
 ):
     data = movie_service.get_movies(db, page, page_size)
-    return {
-        "status": "success",
-        "data": data
-    }
+    return Response(
+        status = "success",
+        data = MovieListItem(
+            id = data["id"],
+            title = data["title"],
+            release_year = data["Orelease_year"],
+            cast = data["cast"],
+            director = data["director"],
+            genres = data["genres"],
+            average_rating = data["average_rating"],
+            ratings_count = data["ratings_count"]
+        )      
+    )
 
-@router.get("/{movie_id}", response_model=MovieDetail, status_code=status.HTTP_200_OK)
+@router.get("/{movie_id}", response_model=Response[MovieDetail], status_code=status.HTTP_200_OK)
 def get_movie_detail(
     movie_id: int,
     db: Session = Depends(get_db)
 ):
-    movie = movie_service.get_movie_detail(db, movie_id)
-    if not movie:
+    data = movie_service.get_movie_detail(db, movie_id)
+    if not data:
         raise MovieNotFoundError(movie_id)
 
-    return {
-        "status": "success",
-        "data": movie
-    }
+    return Response(
+        status = "success",
+        data = MovieDetail(
+            id = data["id"],
+            title = data["title"],
+            release_year = data["Orelease_year"],
+            cast = data["cast"],
+            director = data["director"],
+            genres = data["genres"],
+            average_rating = data["average_rating"],
+            ratings_count = data["ratings_count"]
+        )      
+    )
        
 @router.post("/{movie_id}/ratings", response_model=Response[RatingOut], status_code=status.HTTP_201_CREATED)
 def add_rating(
