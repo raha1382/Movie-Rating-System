@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
+from typing import List
 
 from datetime import datetime
 from app.db.session import get_db
@@ -99,25 +100,30 @@ def delete_movie(
     movie_service.delete_movie(db, movie_id)
     return None
 
-@router.get("/", response_model=Response[MovieListItem], status_code=status.HTTP_200_OK)
+@router.get("/", response_model=Response[List[MovieListItem]], status_code=status.HTTP_200_OK)
 def list_movies(
     page: int = Query(1, ge=1),
     page_size: int = Query(10, ge=1, le=100),
     db: Session = Depends(get_db)
 ):
-    data = movie_service.get_movies(db, page, page_size)
+    result = movie_service.get_movies(db, page, page_size)
+    items = [
+        MovieListItem(
+            id=m["id"],
+            title=m["title"],
+            release_year=m["release_year"],
+            cast=m["cast"],
+            director=m["director"],
+            genres=m["genres"],
+            average_rating=m["average_rating"],
+            ratings_count=m["ratings_count"],
+        )
+        for m in result["data"]
+    ]
+
     return Response(
-        status = "success",
-        data = MovieListItem(
-            id = data["id"],
-            title = data["title"],
-            release_year = data["Orelease_year"],
-            cast = data["cast"],
-            director = data["director"],
-            genres = data["genres"],
-            average_rating = data["average_rating"],
-            ratings_count = data["ratings_count"]
-        )      
+        status="success",
+        data=items
     )
 
 @router.get("/{movie_id}", response_model=Response[MovieDetail], status_code=status.HTTP_200_OK)
@@ -134,7 +140,7 @@ def get_movie_detail(
         data = MovieDetail(
             id = data["id"],
             title = data["title"],
-            release_year = data["Orelease_year"],
+            release_year = data["release_year"],
             cast = data["cast"],
             director = data["director"],
             genres = data["genres"],

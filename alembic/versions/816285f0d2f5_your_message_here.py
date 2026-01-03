@@ -1,8 +1,8 @@
-"""create movie tables
+"""your_message_here
 
-Revision ID: a3228949a02b
-Revises: 
-Create Date: 2026-01-01 21:09:19.801646
+Revision ID: 816285f0d2f5
+Revises: 70fa72df687e
+Create Date: 2026-01-03 20:31:03.538519
 
 """
 from typing import Sequence, Union
@@ -12,8 +12,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'a3228949a02b'
-down_revision: Union[str, Sequence[str], None] = None
+revision: str = '816285f0d2f5'
+down_revision: Union[str, Sequence[str], None] = '70fa72df687e'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -40,6 +40,7 @@ def upgrade() -> None:
     op.create_table('movies',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('title', sa.String(), nullable=False),
+    sa.Column('description', sa.Text(), nullable=True),
     sa.Column('director_id', sa.Integer(), nullable=True),
     sa.Column('release_year', sa.Integer(), nullable=True),
     sa.Column('cast', sa.Text(), nullable=True),
@@ -58,6 +59,7 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('movie_id', sa.Integer(), nullable=True),
     sa.Column('score', sa.Integer(), nullable=False),
+    sa.Column('rated_at', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['movie_id'], ['movies.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
