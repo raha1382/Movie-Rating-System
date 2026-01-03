@@ -163,11 +163,8 @@ class MovieService:
         if not 1 <= score <= 10:
             raise InvalidRatingError(score)
 
-        rating = Rating(movie_id=movie_id, score=score)
-        db.add(rating)
-        db.commit()
-        db.refresh(rating)
-        return rating
+        rate = self.movie_repo.add_rating(db, movie_id, score)
+        return rate
 
     def get_movie_detail(self, db: Session, movie_id: int):
         row = self.movie_repo.fetch_movie_with_aggregation(db, movie_id)

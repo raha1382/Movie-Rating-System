@@ -14,6 +14,13 @@ class MovieRepository:
         db.commit()
         db.refresh(movie)
         return movie
+    
+    def add_rating(self, db: Session, movie_id: int, score: int) -> Rating:
+        rating = Rating(movie_id=movie_id, score=score)
+        db.add(rating)
+        db.commit()
+        db.refresh(rating)
+        return rating
 
     def get_genres_by_ids(self, db: Session, genre_ids: list[int]) -> list[Genre]:
         return db.query(Genre).filter(Genre.id.in_(genre_ids)).all()
