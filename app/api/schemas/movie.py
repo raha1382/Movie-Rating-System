@@ -5,7 +5,7 @@ from datetime import datetime
 data_type = TypeVar("data_type")
 data_type2 = TypeVar("data_type2")
 
-class MovieCreateResponse(BaseModel,  Generic[data_type]):
+class Response(BaseModel,  Generic[data_type]):
     status: Literal['success', 'failure'] = 'success'
     data: data_type
     updated_at: datetime | None = None

@@ -9,7 +9,7 @@ from app.api.schemas.movie import (
     Movieupdate,
     MovieListItem,
     MovieDetail,
-    MovieCreateResponse,
+    Response,
     DirectorOut,
     MovieOut
 )
@@ -22,7 +22,7 @@ router = APIRouter(prefix="/api/v1/movies", tags=["Movies"])
 movie_service = MovieService()
 
 
-@router.post("/", response_model=MovieCreateResponse[MovieOut[DirectorOut]], status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=Response[MovieOut[DirectorOut]], status_code=status.HTTP_201_CREATED)
 def create_movie(
     payload: Moviein,
     db: Session = Depends(get_db)
@@ -54,7 +54,7 @@ def create_movie(
         updated_at = None
     )
 
-@router.put("/{movie_id}", response_model=MovieCreateResponse[MovieOut[DirectorOut]], status_code=status.HTTP_200_OK)
+@router.put("/{movie_id}", response_model=Response[MovieOut[DirectorOut]], status_code=status.HTTP_200_OK)
 def update_movie(
     movie_id: int,
     payload: Movieupdate,
