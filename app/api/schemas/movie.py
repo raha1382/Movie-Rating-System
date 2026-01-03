@@ -31,7 +31,7 @@ class Moviein(BaseModel):
 
 class Movieupdate(BaseModel):
     title: Optional[str] = None
-    release_year: Optional[int] = Field(None, ge=1888, le=2100)
+    release_year: Optional[int] = Field(None, ge=1888, le=2026)
     director_id: Optional[int] = None
     genres: Optional[List[int]] = None
     cast: Optional[str] = None

@@ -50,3 +50,4 @@ Traceback (most recent call last):
     raise MovieNotFoundError(movie_id)
 app.exceptions.movie_exceptions.MovieNotFoundError: movie with id 1006 not found
 2026-01-04 01:44:10,802 - movie_rating - WARNING - Validation error at ('body', 'release_year'): Input should be greater than or equal to 1888
+2026-01-04 01:45:39,430 - movie_rating - INFO - Application startup complete
