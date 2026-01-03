@@ -4,6 +4,7 @@ from datetime import datetime
 
 data_type = TypeVar("data_type")
 data_type2 = TypeVar("data_type2")
+data_type3 = TypeVar("data_type3")
 
 class Response(BaseModel,  Generic[data_type]):
     status: Literal['success', 'failure'] = 'success'
@@ -41,15 +42,11 @@ class DirectorOut(BaseModel):
     name: str
 
 
-class MovieListItem(BaseModel):
-    id: int
-    title: str
-    release_year: Optional[int]
-    cast: Optional[str]
-    director: str
-    genres: List[str]
-    average_rating: float
-    ratings_count: int
+class MovieListItem(BaseModel, Generic[data_type3]):
+    page: int
+    page_size: int
+    total_items: int
+    items: data_type3
 
 
 class MovieDetail(BaseModel):

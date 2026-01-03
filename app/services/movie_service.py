@@ -104,42 +104,6 @@ class MovieService:
 
         return self.movie_repo.save(db, movie)
     
-    def list_movies(
-        self,
-        db: Session,
-        title: str | None = None,
-        release_year: int | None = None,
-        genre_name: str | None = None,
-        page: int = 1,
-        page_size: int = 10
-    ) -> dict:
-
-        movies = self.movie_repo.list_all(db) 
-
-        if title:
-            movies = [m for m in movies if title.lower() in m.title.lower()]
-
-        if release_year:
-            movies = [m for m in movies if m.release_year == release_year]
-
-        if genre_name:
-            movies = [
-                m for m in movies
-                if any(g.name.lower() == genre_name.lower() for g in m.genres)
-            ]
-
-        total = len(movies)
-        start = (page - 1) * page_size
-        end = start + page_size
-        paginated = movies[start:end]
-
-        return {
-            "items": paginated,
-            "total": total,
-            "page": page,
-            "page_size": page_size,
-            "pages": (total + page_size - 1) // page_size
-        }
     
     def delete_movie(self, db: Session, movie_id: int) -> None:
         movie = self.movie_repo.get_by_id(db, movie_id)
@@ -150,9 +114,27 @@ class MovieService:
 
     # Aggregation / Ratings Methods
 
-    def get_movies(self, db: Session, page: int = 1, page_size: int = 10):
+    def get_movies(
+        self,
+        db: Session,
+        page: int = 1,
+        page_size: int = 10,
+        title: str | None = None,
+        director: str | None = None,
+        genre: str | None = None,
+        release_year: int | None = None
+    ):
         skip = (page - 1) * page_size
-        raw_movies = self.movie_repo.fetch_movies_with_aggregation(db, skip=skip, limit=page_size)
+
+        raw_movies = self.movie_repo.fetch_movies_with_aggregation(
+            db,
+            skip=skip,
+            limit=page_size,
+            title=title,
+            director_name=director,
+            genre_name=genre,
+            release_year=release_year
+        )
 
         result = []
         for movie, director_name, avg_rating, ratings_count in raw_movies:
@@ -171,8 +153,10 @@ class MovieService:
         return {
             "page": page,
             "page_size": page_size,
-            "data": result
+            "data": result,
+            "total_items": len(result)
         }
+
 
     def add_rating(self, db: Session, movie_id: int, score: int):
 

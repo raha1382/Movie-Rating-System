@@ -100,15 +100,27 @@ def delete_movie(
     movie_service.delete_movie(db, movie_id)
     return None
 
-@router.get("/", response_model=Response[List[MovieListItem]], status_code=status.HTTP_200_OK)
+@router.get("/", response_model=Response[MovieListItem[list[MovieDetail]]], status_code=status.HTTP_200_OK)
 def list_movies(
+    title: str | None = Query(None, description="Filter by movie title"),
+    director: str | None = Query(None, description="Filter by director name"),
+    genre: str | None = Query(None, description="Filter by genre"),
+    release_year: int | None = Query(None, description="Filter by movie release year"),
     page: int = Query(1, ge=1),
     page_size: int = Query(10, ge=1, le=100),
     db: Session = Depends(get_db)
 ):
-    result = movie_service.get_movies(db, page, page_size)
-    items = [
-        MovieListItem(
+    result = movie_service.get_movies(
+        db=db,
+        title=title,
+        director=director,
+        genre=genre,
+        release_year=release_year,
+        page=page,
+        page_size=page_size
+    )
+    result_items = [
+        MovieDetail(
             id=m["id"],
             title=m["title"],
             release_year=m["release_year"],
@@ -123,7 +135,12 @@ def list_movies(
 
     return Response(
         status="success",
-        data=items
+        data=MovieListItem(
+            page= result["page"],
+            page_size= result["page_size"],
+            total_items= result["total_items"],
+            items= result_items
+        )
     )
 
 @router.get("/{movie_id}", response_model=Response[MovieDetail], status_code=status.HTTP_200_OK)

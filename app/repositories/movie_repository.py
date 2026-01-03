@@ -36,7 +36,16 @@ class MovieRepository:
 
     # Aggregation / Ratings Methods
 
-    def fetch_movies_with_aggregation(self, db: Session, skip: int = 0, limit: int = 10):
+    def fetch_movies_with_aggregation(
+            self, 
+            db: Session, 
+            skip: int = 0, 
+            limit: int = 10,
+            title: str | None = None,
+            director_name: str | None = None,
+            genre_name: str | None = None,
+            release_year: int | None = None
+    ):
         query = (
             db.query(
                 Movie,
@@ -46,9 +55,26 @@ class MovieRepository:
             )
             .join(Movie.director)
             .outerjoin(Movie.ratings)
-            .group_by(Movie.id, Director.name)
+            .outerjoin(Movie.genres)
+        )
+
+        if title:
+            query = query.filter(Movie.title.ilike(f"%{title}%"))
+
+        if director_name:
+            query = query.join(Movie.director).filter(Director.name.ilike(f"%{director_name}%"))
+
+        if genre_name:
+            query = query.filter(Movie.genres.any(Genre.name.ilike(f"%{genre_name}%")))
+
+        if release_year:
+            query = query.filter(Movie.release_year == release_year)
+
+
+        query = (
+            query.group_by(Movie.id, Director.name)
             .order_by(Movie.id)
-            .offset(skip) 
+            .offset(skip)
             .limit(limit)
         )
         return query.all()
