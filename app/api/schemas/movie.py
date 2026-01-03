@@ -18,6 +18,7 @@ class MovieOut(BaseModel, Generic[data_type2]):
     cast: Optional[str] = None
     average_rating: float | None = None
     ratings_count: int
+    updated_at: datetime | None = None
 
 
 class Moviein(BaseModel):
@@ -33,7 +34,6 @@ class Movieupdate(BaseModel):
     director_id: Optional[int] = None
     genres: Optional[List[int]] = None
     cast: Optional[str] = None
-    updated_at: datetime | None = None
 
 
 class DirectorOut(BaseModel):
